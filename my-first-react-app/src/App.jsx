@@ -1,10 +1,20 @@
 import React from 'react'
+import Search from './components/Search'
 
 const App = () => {
   return (
-    <div>
-      <h1 className="text-3xl">Hell</h1>
-    </div>
+    <main>
+      <div className='pattern'/>
+
+      <div className="wrapper">
+        <header>
+          <img src='./hero-img (1).png' alt='hero-banner'/>
+          <h1>Find <span className="text-gradient">Movies</span> You'll Enjoy</h1>
+        </header>
+
+        <Search/>
+      </div>
+    </main>
   )
 }
 
