@@ -26,37 +26,41 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [trendingMovies, setTrendingMovies] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
 
   // Debounce the search term to prevent making too many API requests
   // by waiting for the user to stop typing for 500ms
   useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm])
 
-  const fetchMovies = async (query = '') => {
+  const fetchMovies = async (query = '', page = 1) => {
     setIsLoading(true);
     setErrorMessage('');
 
     try {
       const endpoint = query
-        ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
-        : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
+        ? `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}&page=${page}`
+        : `${API_BASE_URL}/discover/movie?sort_by=popularity.desc&page=${page}`;
 
       const response = await fetch(endpoint, API_OPTIONS);
 
-      if(!response.ok) {
+      if (!response.ok) {
         throw new Error('Failed to fetch movies');
       }
 
       const data = await response.json();
 
-      if(data.Response === 'False') {
+      if (data.Response === 'False') {
         setErrorMessage(data.Error || 'Failed to fetch movies');
         setMovieList([]);
         return;
       }
 
       setMovieList(data.results || []);
+      setTotalPages(data.total_pages); // Set total pages from API response
 
-      if(query && data.results.length > 0) {
+      if (query && data.results.length > 0) {
         await updateSearchCount(query, data.results[0]);
       }
     } catch (error) {
@@ -65,7 +69,8 @@ const App = () => {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
+
 
   const loadTrendingMovies = async () => {
     try {
@@ -78,8 +83,8 @@ const App = () => {
   }
 
   useEffect(() => {
-    fetchMovies(debouncedSearchTerm);
-  }, [debouncedSearchTerm]);
+    fetchMovies(debouncedSearchTerm, currentPage);
+  }, [debouncedSearchTerm, currentPage]); // Add currentPage as a dependency
 
   useEffect(() => {
     loadTrendingMovies();
@@ -87,7 +92,7 @@ const App = () => {
 
   return (
     <main>
-      <div className="pattern" style={{ backgroundImage: "url('./BG.png')" }}/>
+      <div className="pattern" style={{ backgroundImage: "url('./BG.png')" }} />
       <div className="wrapper">
         <header>
           <img src="./hero-img (1).png" alt="Hero Banner" />
@@ -126,7 +131,32 @@ const App = () => {
             </ul>
           )}
         </section>
+
+        
+      <div className="flex items-center justify-between gap-4 mt-12">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="p-2 px-3 rounded-md bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+
+        <span className="text-lg font-medium text-white px-4">
+         {currentPage} / {totalPages}
+        </span>
+
+        <button
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="p-2 px-4 rounded-md bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
       </div>
+
+      </div>
+
     </main>
   )
 }
