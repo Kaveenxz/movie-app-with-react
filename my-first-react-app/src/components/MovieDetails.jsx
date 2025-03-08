@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { FaPlayCircle } from "react-icons/fa";
 
 const API_BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY =
@@ -47,12 +48,14 @@ const MovieDetails = () => {
 
   return (
     <div className="min-h-screen bg-[#0f0f1b] text-white p-6 flex justify-center">
-      <div className="max-w-6xl bg-[#161629] p-6 md:px-16 rounded-2xl shadow-lg">
+  <div className="max-w-6xl bg-[#161629] p-6 md:px-16 rounded-2xl shadow-lg 
+                  ring-2 ring-indigo-600 animate-glow">
+
         {/* Title & Rating */}
         <div className="flex justify-between items-center">
           <div><h1 className="text-4xl font-bold">{movie.title}</h1></div>
           <div className="bg-[#222245] px-3 py-1 rounded-lg flex items-center gap-2">
-            ⭐ <span className="text-yellow-400 font-bold">{movie.vote_average?.toFixed(1)}</span> 
+            ⭐ <span className="text-yellow-400 font-bold">{movie.vote_average?.toFixed(1)}</span>
             <span className="text-gray-400">({movie.vote_count})</span>
           </div>
         </div>
@@ -73,103 +76,125 @@ const MovieDetails = () => {
 
           {/* Middle - Trailer */}
           {trailer ? (
-            // <iframe
-            //   className="w-[45rem]  rounded-lg"
-            //   src={`https://www.youtube.com/embed/${trailer.key}`}
-            //   title="Movie Trailer"
-            //   allowFullScreen
-            // ></iframe>
-            <img
-            src={`https://image.tmdb.org/t/p/w780/${movie.backdrop_path}`} 
-            alt={movie.title}
-            className="rounded-lg h-[27rem]"
-          />
-            
+
+            <div className="relative group cursor-pointer">
+
+              <img
+                src={`https://image.tmdb.org/t/p/w780/${movie.backdrop_path}`}
+                alt={movie.title}
+                className="rounded-lg h-[27rem] w-full object-cover"
+              />
+
+              <a
+                href={`https://www.youtube.com/watch?v=${trailer.key}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              >
+                <FaPlayCircle className="text-white text-6xl drop-shadow-lg" />
+              </a>
+            </div>
+
           ) : (
             <div className="text-center text-gray-400">No Trailer Available</div>
           )}
 
           {/* Right - Overview & Genres */}
-          
+
         </div>
 
-        <div>
-            <p className="text-gray-300">{movie.overview}</p>
-            <div className="mt-4 flex flex-wrap gap-2">
+        {/* Additional Details */}
+        <div className="mt-6 grid grid-cols-1">
+
+        <div className="mt-6 flex justify-between items-center">
+          {/* Genres on the Left */}
+          <div>
+            
+            <div className="flex flex-wrap gap-2 ">
+            <h3 className="text-lg font-semibold mr-36">Genres</h3>
               {movie.genres?.map((genre) => (
+                <div>
+                  
                 <span
                   key={genre.id}
-                  className="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm"
+                  className="bg-indigo-900 text-white px-3 py-2 rounded-sm text-sm"
                 >
                   {genre.name}
                 </span>
+                </div>
               ))}
             </div>
           </div>
 
-        {/* Additional Details */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-lg font-semibold">Release Date:</h3>
+          {/* Go to Home Button on the Right */}
+          <button
+            onClick={() => navigate("/")}
+            className="bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-600 transition"
+          >
+            Back to Home
+          </button>
+        </div>
+
+          <div className="flex mt-6">
+            <h3 className="text-lg font-semibold mr-34">Overview</h3>
+            <p className="text-gray-400">{movie.overview}</p>
+          </div>
+
+          <div className="flex mt-4 items-center">
+            <h3 className="text-lg font-semibold mr-26">Release Date</h3>
             <p className="text-gray-400">{movie.release_date}</p>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold">Countries:</h3>
+          <div className="flex mt-4 items-center">
+            <h3 className="text-lg font-semibold mr-33">Countries</h3>
             <p className="text-gray-400">
               {movie.production_countries?.map((c) => c.name).join(", ") || "N/A"}
             </p>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold">Budget:</h3>
+          <div className="flex mt-4 items-center">
+            <h3 className="text-lg font-semibold mr-39">Budget</h3>
             <p className="text-gray-400">
               {movie.budget ? `$${movie.budget.toLocaleString()}` : "N/A"}
             </p>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold">Revenue:</h3>
+          <div className="mt-4 flex items-center">
+            <h3 className="text-lg font-semibold mr-36">Revenue</h3>
             <p className="text-gray-400">
               {movie.revenue ? `$${movie.revenue.toLocaleString()}` : "N/A"}
             </p>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold">Languages:</h3>
+          <div className="mt-4 flex items-center">
+            <h3 className="text-lg font-semibold mr-32">Languages</h3>
             <p className="text-gray-400">
               {movie.spoken_languages?.map((l) => l.english_name).join(", ") || "N/A"}
             </p>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold">Status:</h3>
+          <div className="mt-4 flex items-center">
+            <h3 className="text-lg font-semibold mr-41">Status</h3>
             <p className="text-gray-400">
               {movie.status || "N/A"}
             </p>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold">tagline:</h3>
+          <div className="mt-4 flex items-center">
+            <h3 className="text-lg font-semibold mr-40">tagline</h3>
             <p className="text-gray-400">
               {movie.tagline || "N/A"}
             </p>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold">Production Companies:</h3>
+          <div className="mt-4 flex items-center">
+            <h3 className="text-lg font-semibold mr-6">Production Companies</h3>
             <p className="text-gray-400">
               {movie.production_companies?.map((p) => p.name).join(", ") || "N/A"}
             </p>
           </div>
         </div>
 
-        <button
-          onClick={() => navigate("/")}
-          className="mt-4 bg-gray-700 px-4 py-2 rounded-lg hover:bg-gray-600 transition"
-        >
-          Back to Home
-        </button>
       </div>
     </div>
   );
